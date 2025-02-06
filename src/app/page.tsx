@@ -1,22 +1,32 @@
+"use client";
+
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+
+import { useCurrent } from "@/features/auth/api/use-current";
+import { useLogout } from "@/features/auth/api/use-logout";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 
 export default function Home() {
+  const router = useRouter();
+  const { data, isLoading } = useCurrent();
+  const { mutate } = useLogout();
+
+  useEffect(() => {
+    if (!data && !isLoading) {
+      router.push("/sign-in");
+    }
+  }, [data]);
   return (
-    <div className="">
-      <Input />
-      <Button disabled>Default</Button>
-      <Button variant={"primary"} size="xs" disabled>
-        primary
+    <div>
+      只允许登陆用户访问
+      <Button
+        onClick={() => {
+          mutate();
+        }}
+      >
+        退出登录
       </Button>
-      <Button variant={"warning"}>warning</Button>
-      <Button variant={"link"}>link</Button>
-      <Button variant="destructive">destructive</Button>
-      <Button variant="ghost">ghost</Button>
-      <Button variant="outline">outline</Button>
-      <Button variant="secondary">secondary</Button>
-      <Button variant="muted">muted</Button>
-      <Button variant="teritrary">teritrary</Button>
     </div>
   );
 }
