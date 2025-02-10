@@ -1,3 +1,4 @@
+import { toast } from "sonner";
 import { useMutation } from "@tanstack/react-query";
 import { InferRequestType, InferResponseType } from "hono";
 import { useRouter } from "next/navigation";
@@ -12,11 +13,19 @@ export const useRegister = () => {
 
   const mutation = useMutation<ResponseType, Error, RequestType>({
     mutationFn: async (json) => {
-      const response = await client.api.auth.register["$post"](json);
-      return await response.json();
+      const res = await client.api.auth.register["$post"](json);
+
+      if (!res.ok) {
+        throw new Error("注册失败");
+      }
+      return await res.json();
     },
     onSuccess: () => {
+      toast.success("注册成功");
       router.refresh();
+    },
+    onError: (error) => {
+      toast.error("注册失败：" + error.message);
     },
   });
 

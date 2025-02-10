@@ -22,7 +22,7 @@ import { loginSchema } from "../schemas";
 import { useLogin } from "../api/use-login";
 
 export const SignInCard = () => {
-  const { mutate, isPending, isError, error } = useLogin();
+  const { mutate, isPending } = useLogin();
 
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
@@ -75,11 +75,7 @@ export const SignInCard = () => {
                 </FormItem>
               )}
             />
-            {isError ? (
-              <div className="text-[0.8rem] font-medium text-destructive">
-                An error occurred: {error.message}
-              </div>
-            ) : null}
+
             <Button disabled={isPending} size={"lg"} className="w-full">
               登录
             </Button>

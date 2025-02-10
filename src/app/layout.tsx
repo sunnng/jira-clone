@@ -4,6 +4,8 @@ import localFont from "next/font/local";
 import { cn } from "@/lib/utils";
 import { QueryProvider } from "@/components/query-provider";
 
+import { Toaster } from "@/components/ui/sonner";
+
 import "./globals.css";
 
 const geistSans = localFont({
@@ -36,7 +38,10 @@ export default function RootLayout({
           "antialiased min-h-screen"
         )}
       >
-        <QueryProvider>{children}</QueryProvider>
+        <QueryProvider>
+          <Toaster />
+          {children}
+        </QueryProvider>
       </body>
     </html>
   );

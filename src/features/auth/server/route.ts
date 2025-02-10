@@ -35,8 +35,8 @@ const app = new Hono()
         sameSite: "strict",
         maxAge: 60 * 60 * 24 * 30,
       });
-      const result: LoginResponse = { success: true };
-      return c.json(result);
+
+      return c.json<LoginResponse>({ success: true });
     } catch (e) {
       return c.json({ success: false, error: (e as Error).message }, 401);
     }
@@ -46,19 +46,22 @@ const app = new Hono()
 
     const { account } = await createAdminClient();
 
-    await account.create(ID.unique(), email, password, name);
+    try {
+      await account.create(ID.unique(), email, password, name);
+      const session = await account.createEmailPasswordSession(email, password);
 
-    const session = await account.createEmailPasswordSession(email, password);
-
-    setCookie(c, AUTH_COOKIE, session.secret, {
-      path: "/",
-      httpOnly: true,
-      secure: true,
-      sameSite: "strict",
-      maxAge: 60 * 60 * 24 * 30,
-    });
-
-    return c.json({ success: true });
+      setCookie(c, AUTH_COOKIE, session.secret, {
+        path: "/",
+        httpOnly: true,
+        secure: true,
+        sameSite: "strict",
+        maxAge: 60 * 60 * 24 * 30,
+      });
+      const result: LoginResponse = { success: true };
+      return c.json(result);
+    } catch (e) {
+      return c.json({ success: false, error: (e as Error).message }, 401);
+    }
   })
   .post("/logout", sessionMiddleware, async (c) => {
     const account = c.get("account");

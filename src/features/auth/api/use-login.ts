@@ -1,3 +1,4 @@
+import { toast } from "sonner";
 import { InferRequestType, InferResponseType } from "hono";
 import { useRouter } from "next/navigation";
 import { useMutation } from "@tanstack/react-query";
@@ -21,7 +22,11 @@ export const useLogin = () => {
       return data;
     },
     onSuccess: () => {
+      toast.success("登录成功");
       router.refresh();
+    },
+    onError: (error) => {
+      toast.error("登录失败: " + error.message);
     },
   });
 
