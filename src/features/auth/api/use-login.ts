@@ -12,8 +12,13 @@ export const useLogin = () => {
 
   const mutation = useMutation<ResponseType, Error, RequestType>({
     mutationFn: async ({ json }) => {
-      const response = await client.api.auth.login["$post"]({ json });
-      return await response.json();
+      const res = await client.api.auth.login["$post"]({ json });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error);
+      }
+      const data = await res.json();
+      return data;
     },
     onSuccess: () => {
       router.refresh();

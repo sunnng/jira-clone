@@ -9,6 +9,11 @@ import { createAdminClient } from "@/lib/appwrite";
 import { loginSchema, registerSchema } from "../schemas";
 import { AUTH_COOKIE } from "../constants";
 
+interface LoginResponse {
+  success: boolean;
+  error?: string;
+}
+
 const app = new Hono()
   .get("/current", sessionMiddleware, async (c) => {
     const user = c.get("user");
@@ -19,17 +24,22 @@ const app = new Hono()
     const { email, password } = c.req.valid("json");
 
     const { account } = await createAdminClient();
-    const session = await account.createEmailPasswordSession(email, password);
 
-    setCookie(c, AUTH_COOKIE, session.secret, {
-      path: "/",
-      httpOnly: true,
-      secure: true,
-      sameSite: "strict",
-      maxAge: 60 * 60 * 24 * 30,
-    });
+    try {
+      const session = await account.createEmailPasswordSession(email, password);
 
-    return c.json({ success: true });
+      setCookie(c, AUTH_COOKIE, session.secret, {
+        path: "/",
+        httpOnly: true,
+        secure: true,
+        sameSite: "strict",
+        maxAge: 60 * 60 * 24 * 30,
+      });
+      const result: LoginResponse = { success: true };
+      return c.json(result);
+    } catch (e) {
+      return c.json({ success: false, error: (e as Error).message }, 401);
+    }
   })
   .post("/register", zValidator("json", registerSchema), async (c) => {
     const { name, email, password } = c.req.valid("json");
