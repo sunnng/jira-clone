@@ -38,10 +38,8 @@ export default function RootLayout({
           "antialiased min-h-screen"
         )}
       >
-        <QueryProvider>
-          <Toaster />
-          {children}
-        </QueryProvider>
+        <Toaster />
+        <QueryProvider>{children}</QueryProvider>
       </body>
     </html>
   );
