@@ -25,11 +25,9 @@ import { cn } from "@/lib/utils";
 
 import { Project } from "../type";
 import { updateProjectSchema } from "../schemas";
-import { useUpdateWorkspace } from "../api/use-update-workspace";
+
 import { useConfirm } from "@/hooks/use-confirm";
-import { useDeleteWorkspace } from "../api/use-delete-workspace";
-import { toast } from "sonner";
-import { useResetInviteCode } from "../api/use-reset-invite-code";
+import { useUpdateProject } from "../api/use-update-project";
 
 interface EditProjectFormProps {
   onCancel?: () => void;
@@ -48,20 +46,11 @@ export const EditWorkspaceForm = ({
     "destructive"
   );
 
-  const [ResetDialog, confirmReset] = useConfirm(
-    "Reset Invite Link",
-    "This will invalidate the current invite link",
-    "destructive"
-  );
+  const { mutate, isPending } = useUpdateProject();
+  const { mutate: deleteWorkspace, isPending: isDeletingWorkspace } =
+    useUpdateProject();
 
   const inputRef = useRef<HTMLInputElement>(null);
-
-  const { mutate, isPending } = useUpdateWorkspace();
-  const { mutate: deleteWorkspace, isPending: isDeletingWorkspace } =
-    useDeleteWorkspace();
-
-  const { mutate: resetInviteCode, isPending: isResettingInviteCode } =
-    useResetInviteCode();
 
   const form = useForm<z.infer<typeof updateProjectSchema>>({
     resolver: zodResolver(updateProjectSchema),
@@ -84,15 +73,6 @@ export const EditWorkspaceForm = ({
     );
   };
 
-  const handleResetInviteCode = async () => {
-    const ok = await confirmReset();
-    if (!ok) return;
-
-    resetInviteCode({
-      param: { workspaceId: initialValues.$id },
-    });
-  };
-
   const onSubmit = (values: z.infer<typeof updateProjectSchema>) => {
     const finalValues = {
       ...values,
@@ -100,7 +80,7 @@ export const EditWorkspaceForm = ({
     };
 
     mutate(
-      { form: finalValues, param: { workspaceId: initialValues.$id } },
+      { form: finalValues, param: { projectId: initialValues.$id } },
       {
         onSuccess: () => {
           form.reset();
@@ -116,17 +96,10 @@ export const EditWorkspaceForm = ({
     }
   };
 
-  const fullInviteLink = `${window.location.origin}/workspaces/${initialValues.$id}/join/${initialValues.inviteCode}`;
-  const handleCopyInviteLink = () => {
-    navigator.clipboard
-      .writeText(fullInviteLink)
-      .then(() => toast.success("Invite link copied to clipboard"));
-  };
-
   return (
     <div className="flex flex-col gap-y-4">
       <DeleteDialog />
-      <ResetDialog />
+
       <Card className="w-full h-full border-none shadow-none">
         <CardHeader className="flex flex-row items-center gap-x-4 p-7 space-y-0">
           <Button
