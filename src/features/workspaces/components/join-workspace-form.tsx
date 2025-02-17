@@ -10,7 +10,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
 import { useJoinWorkspace } from "../api/use-join-workspace";
-import { useWorkspaceId } from "../hooks/use-workspace-id";
+
 import { useRouter } from "next/navigation";
 
 interface JoinWorkspaceFormProps {

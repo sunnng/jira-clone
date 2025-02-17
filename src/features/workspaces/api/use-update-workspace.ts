@@ -3,6 +3,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 import { client } from "@/lib/rpc";
+import { useRouter } from "next/navigation";
 
 const $patch = client.api.workspaces[":workspaceId"]["$patch"];
 
@@ -11,6 +12,7 @@ type ErrorResponseType = { error: string };
 type ResponseType200 = InferResponseType<typeof $patch, 200>;
 
 export const useUpdateWorkspace = () => {
+  const router = useRouter();
   const queryClient = useQueryClient();
 
   const mutation = useMutation<ResponseType200, Error, RequestType>({
@@ -30,6 +32,7 @@ export const useUpdateWorkspace = () => {
     },
     onSuccess: ({ data }) => {
       toast.success("Workspace updated");
+      router.refresh();
       queryClient.invalidateQueries({ queryKey: ["workspaces"] });
       queryClient.invalidateQueries({ queryKey: ["workspaces", data.$id] });
     },

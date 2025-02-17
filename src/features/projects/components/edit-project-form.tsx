@@ -23,23 +23,23 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-import { Workspace } from "../type";
-import { updateWorkspaceSchema } from "../schemas";
+import { Project } from "../type";
+import { updateProjectSchema } from "../schemas";
 import { useUpdateWorkspace } from "../api/use-update-workspace";
 import { useConfirm } from "@/hooks/use-confirm";
 import { useDeleteWorkspace } from "../api/use-delete-workspace";
 import { toast } from "sonner";
 import { useResetInviteCode } from "../api/use-reset-invite-code";
 
-interface EditWorkspaceFormProps {
+interface EditProjectFormProps {
   onCancel?: () => void;
-  initialValues: Workspace;
+  initialValues: Project;
 }
 
 export const EditWorkspaceForm = ({
   onCancel,
   initialValues,
-}: EditWorkspaceFormProps) => {
+}: EditProjectFormProps) => {
   const router = useRouter();
 
   const [DeleteDialog, confirmDelete] = useConfirm(
@@ -63,8 +63,8 @@ export const EditWorkspaceForm = ({
   const { mutate: resetInviteCode, isPending: isResettingInviteCode } =
     useResetInviteCode();
 
-  const form = useForm<z.infer<typeof updateWorkspaceSchema>>({
-    resolver: zodResolver(updateWorkspaceSchema),
+  const form = useForm<z.infer<typeof updateProjectSchema>>({
+    resolver: zodResolver(updateProjectSchema),
     defaultValues: { ...initialValues, image: initialValues.imageUrl ?? "" },
   });
 
@@ -93,7 +93,7 @@ export const EditWorkspaceForm = ({
     });
   };
 
-  const onSubmit = (values: z.infer<typeof updateWorkspaceSchema>) => {
+  const onSubmit = (values: z.infer<typeof updateProjectSchema>) => {
     const finalValues = {
       ...values,
       image: values.image instanceof File ? values.image : "",
