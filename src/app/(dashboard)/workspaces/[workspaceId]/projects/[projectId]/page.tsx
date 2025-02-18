@@ -14,7 +14,7 @@ const ProjectIdPage = async ({ params }: ProjectIdPageProps) => {
   const user = await getCurrent();
   if (!user) redirect("/sign-in");
 
-  const initialValues = await getProject({ proajectId: params.projectId });
+  const initialValues = await getProject({ projectId: params.projectId });
 
   if (!initialValues) {
     throw new Error("Project not found");
